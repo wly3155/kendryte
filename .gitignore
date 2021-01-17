@@ -81,7 +81,6 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
-Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -807,7 +806,5 @@ kendryte-standlone-sdk.si4project/
 
 kendryte-standalone-demo
 kendryte-standalone-demo-bak
-src/
-!src/hello_world
 /CMakeSettings.json
 /build_i

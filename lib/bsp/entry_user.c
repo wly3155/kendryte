@@ -62,6 +62,7 @@ int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_
     return user_main(0, 0);
 }
 
+
 void _init_bsp(int core_id, int number_of_cores)
 {
     extern int main(int argc, char* argv[]);
@@ -114,4 +115,3 @@ int pthread_setcancelstate(int __state, int *__oldstate)
 {
     return 0;
 }
-

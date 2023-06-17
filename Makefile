@@ -1,62 +1,71 @@
 
-TARGET = hello_world
-GCC = /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gcc
-AR = /opt/kendryte-toolchain/bin/riscv64-unknown-elf-ar
-OUT := out
+include config.mk
 
-C_FLAGS :=  \
-	-mcmodel=medany \
-	-mabi=lp64f \
-	-march=rv64imafc \
-	-fno-common \
-	-ffunction-sections \
-	-fdata-sections \
-	-fstrict-volatile-bitfields \
-	-fno-zero-initialized-in-bss \
-	-ffast-math \
-	-fno-math-errno \
-	-fsingle-precision-constant \
-	-Os -ggdb -std=gnu11 -Wno-pointer-to-int-cast \
-	-Wall -Werror=all -Wno-error=unused-function \
-	-Wno-error=unused-but-set-variable \
-	-Wno-error=unused-variable -Wno-error=deprecated-declarations \
-	-Wextra -Werror=frame-larger-than=32768 \
-	-Wno-unused-parameter -Wno-sign-compare \
-	-Wno-error=missing-braces -Wno-error=return-type \
-	-Wno-error=pointer-sign -Wno-missing-braces \
-	-Wno-strict-aliasing -Wno-implicit-fallthrough \
-	-Wno-missing-field-initializers -Wno-int-to-pointer-cast \
-	-Wno-error=comment -Wno-error=logical-not-parentheses \
-	-Wno-error=duplicate-decl-specifier -Wno-error=parentheses \
-	-Wno-old-style-declaration -g 
+OUTPUT_DIR=$(PROJECT)_OUT
+TARGET = $(PROJECT)
 
-C_DEFINES := -DCONFIG_LOG_COLORS \
-	-DCONFIG_LOG_ENABLE -DCONFIG_LOG_LEVEL=LOG_VERBOSE -DDEBUG=1 \
-	-DLOG_KERNEL -DLV_CONF_INCLUDE_SIMPLE -D__riscv64 
+#C_FLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 
-C_INCLUDES := -I/home/wuliyong/Documents/kendryte-standalone-sdk-0.5.6/lib/bsp/include \
-	-I/home/wuliyong/Documents/kendryte-standalone-sdk-0.5.6/lib/drivers/include \
-	-I/home/wuliyong/Documents/kendryte-standalone-sdk-0.5.6/lib/utils/include 
+# default action: build all
+all: $(OUTPUT_DIR)/$(TARGET).elf
+	$(_CROSS_COMPILER_OBJCOPY_) -O ihex $(OUTPUT_DIR)/$(TARGET).elf $(OUTPUT_DIR)/$(TARGET).hex
+	$(_CROSS_COMPILER_OBJCOPY_) -O binary $(OUTPUT_DIR)/$(TARGET).elf $(OUTPUT_DIR)/$(TARGET).bin
+	$(_CROSS_COMPILER_OBJDUMP_) -S -d $(OUTPUT_DIR)/$(TARGET).elf > $(OUTPUT_DIR)/$(TARGET).asm
+	@echo "Sucessfuly build" $(PROJECT)
 
+#######################################
+# build the application
+#######################################
+# list of objects
+C_FILES := $(patsubst ./%,%,$(C_FILES))
+vpath %.c $(sort $(dir $(C_FILES)))
+OBJECTS := $(sort $(C_FILES:%.c=$(OUTPUT_DIR)/%.o))
 
+# list of ASM program objects
+ASM_FILES := $(patsubst ./%,%,$(ASM_FILES))
+vpath %.s $(sort $(dir $(ASM_FILES)))
+OBJECTS += $(sort $(ASM_FILES:%.s=$(OUTPUT_DIR)/%.o))
 
-SOURCE := \
-	src/crt.S \
-	src/entry_user.c \
-	src/main.c 
+$(OUTPUT_DIR)/%.o : %.c Makefile | $(OUTPUT_DIR)
+	@echo 'compile $< to $@'
+	@mkdir -p $(dir $@)
+	$(_CROSS_COMPILER_GCC_) -c $(C_FLAGS) $(LD_FLAGS) $(INCLUDES) \
+	-Wa,-a,-ad,-alms=$(OUTPUT_DIR)/$(<:.c=.lst) $< -o $@
 
-all:ar
-	$(GCC) -o $(TARGET) -L ./ -lkendryte
-.PHONY=all
+$(OUTPUT_DIR)/%.o : %.s Makefile | $(OUTPUT_DIR)
+	@echo 'compile $< to $@'
+	@mkdir -p $(dir $@)
+	$(_CROSS_COMPILER_GCC_) -x assembler-with-cpp -c $(C_FLAGS) $(LD_FLAGS) $(INCLUDES) $< -o $@
 
-ar:obj
-	$(AR) qc libkendryte.a crt.o main.o entry_user.o
-.PHONY=ar
+$(OUTPUT_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
+	$(_CROSS_COMPILER_GCC_) $(OBJECTS) $(C_FLAGS) $(LD_FLAGS) $(LD_LIBS) -Wl,-Map=$(OUTPUT_DIR)/$(TARGET).map -T$(LD_SCRIPT) -o $@
+	$(_CROSS_COMPILER_SIZE_) $@
 
-obj:
-	$(GCC) -c $(CFLAGS) $(C_DEFINES) $(C_INCLUDES) $(SOURCE)
-.PHONY:obj
+$(OUTPUT_DIR):
+	mkdir -p $@
 
+.phony: clean
 clean:
-	-rm -rf *.bin *.o *.a
-.PHONY:clean
+	-rm -fR .dep $(OUTPUT_DIR)
+
+#below for STM32 Usage Download Only
+force_download:
+	$(FLASH_TOOL) --connect-under-reset erase $(FLASH_ADDR) $(FLASH_SIZE)
+	$(FLASH_TOOL) --connect-under-reset --reset write $(OUTPUT_DIR)/$(TARGET).bin $(FLASH_ADDR)
+
+erase_and_download:
+	$(FLASH_TOOL) erase $(FLASH_ADDR) $(FLASH_SIZE)
+	$(FLASH_TOOL) --reset write $(OUTPUT_DIR)/$(TARGET).bin $(FLASH_ADDR)
+
+download:
+	$(FLASH_TOOL) --reset write $(OUTPUT_DIR)/$(TARGET).bin $(FLASH_ADDR)
+
+gdb_server_start:
+	$(GDB_SERVER)
+
+gdb:
+	$(_CROSS_COMPILER_GDB_) $(OUTPUT_DIR)/$(TARGET).elf
+#From GDB, connect to the server using:
+#(gdb) target extended localhost:4242
+
+-include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)

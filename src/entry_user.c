@@ -26,7 +26,6 @@
 #include "uart.h"
 #include "syscalls.h"
 
-#if 0
 extern volatile uint64_t g_wake_up[2];
 
 core_instance_t core1_instance;
@@ -56,7 +55,6 @@ int register_core1(core_function func, void *ctx)
     core_enable(1);
     return 0;
 }
-#endif
 
 int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_main)(int, char**))
 {
@@ -67,7 +65,6 @@ int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_
 
 void _init_bsp(int core_id, int number_of_cores)
 {
-#if 0
     extern int main(int argc, char* argv[]);
     extern void __libc_init_array(void);
     extern void __libc_fini_array(void);
@@ -112,13 +109,9 @@ void _init_bsp(int core_id, int number_of_cores)
             ret = core1_instance.callback(core1_instance.ctx);
     }
     exit(ret);
-#endif
 }
 
-#if 0
 int pthread_setcancelstate(int __state, int *__oldstate)
 {
     return 0;
 }
-#endif
-

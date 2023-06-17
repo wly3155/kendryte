@@ -9,9 +9,6 @@ _CROSS_COMPILER_GDB_=$(_CROSS_COMPILER_DIR_)gdb
 _CROSS_COMPILER_SIZE_=$(_CROSS_COMPILER_DIR_)size
 
 C_FLAGS +=  \
-	-mcmodel=medany \
-	-mabi=lp64f \
-	-march=rv64imafc \
 	-fno-common \
 	-ffunction-sections \
 	-fdata-sections \
@@ -42,8 +39,5 @@ C_FLAGS +=  \
         -Wl,--end-group \
         -Wl,-EL \
         -Wl,--no-relax
-
-LD_FLAGS += -Wl,-u_printf_float\
-	-nostartfiles -Wl,--gc-sections
 
 include platform.mk

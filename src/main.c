@@ -12,25 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//#include <bsp.h>
+#include <bsp.h>
 #include <sysctl.h>
 
-#if 0
 int core1_function(void *ctx)
 {
     uint64_t core = current_coreid();
-    printf("Core %ld Hello world test rebuild\n", core);
+    printf("Core %ld Hello world\n", core);
     while(1);
 }
-#endif
 
 int main(void)
 {
-#if 0
     sysctl_pll_set_freq(SYSCTL_PLL0, 800000000);
     uint64_t core = current_coreid();
     int data;
-    printf("Core %ld Hello world test rebuild\n", core);
+    printf("Core %ld Hello world\n", core);
     register_core1(core1_function, NULL);
 
     /* Clear stdin buffer before scanf */
@@ -40,6 +37,5 @@ int main(void)
     printf("\nData is %d\n", data);
     while(1)
         continue;
-#endif
     return 0;
 }

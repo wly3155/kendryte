@@ -14,28 +14,61 @@
  */
 #include <bsp.h>
 #include <sysctl.h>
+#include <FreeRTOS.h>
+#include <task.h>
+
+static void vTaskCode(void * pvParameters)
+{
+    static uint8_t count = 0;
+
+    while (1) {
+        printf("Core %ld Hello world %u\n", current_coreid(), count);
+        count++;
+        vTaskDelay(1000);
+    }
+}
 
 int core1_function(void *ctx)
 {
+    BaseType_t ret = pdFALSE;
     uint64_t core = current_coreid();
+
     printf("Core %ld Hello world\n", core);
+    ret = xTaskCreate(vTaskCode, "CORE1", 128, NULL, 2, NULL);
+    if (ret != pdPASS)
+        printf("core1 create task fail\n");
+
+    printf("core1 create task sucess\n");
+    vTaskStartScheduler();
     while(1);
 }
 
 int main(void)
 {
+        BaseType_t ret = pdFALSE;
     sysctl_pll_set_freq(SYSCTL_PLL0, 800000000);
     uint64_t core = current_coreid();
     int data;
     printf("Core %ld Hello world\n", core);
-    register_core1(core1_function, NULL);
+    //register_core1(core1_function, NULL);
 
     /* Clear stdin buffer before scanf */
     sys_stdin_flush();
 
     scanf("%d", &data);
     printf("\nData is %d\n", data);
-    while(1)
-        continue;
+
+    ret = xTaskCreate(vTaskCode, "CORE0", 128, NULL, 2, NULL);
+    if (ret != pdPASS)
+        printf("core0 create task fail\n");
+
+    printf("core0 create task sucess\n");
+    vTaskStartScheduler();
     return 0;
+}
+
+void vApplicationIdleHook(void)
+{
+    printf("idle\n");
+    while (1);
 }

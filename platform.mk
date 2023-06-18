@@ -2,6 +2,9 @@
 
 PROJECT=K210
 PROJECT_DIR=$(shell pwd)
+FLASH_TOOL=kflash
+
+CFG_FREERTOS_SUPPORT = yes
 
 C_FLAGS += -DCONFIG_LOG_COLORS
 C_FLAGS += -DCONFIG_LOG_ENABLE
@@ -15,7 +18,9 @@ C_FLAGS += -mcmodel=medany
 C_FLAGS += -mabi=lp64f
 C_FLAGS += -march=rv64imafc
 
+LD_LIBS += -lc
 LD_LIBS += -lm
+LD_LIBS += -lstdc++
 
 LD_FLAGS += -Wl,-u_printf_float \
 	-nostartfiles -Wl,--gc-sections
@@ -29,16 +34,23 @@ PROJECT_SRC_DIR=$(PROJECT_DIR)/src
 INCLUDES += -I$(PROJECT_LIB_BSP_DIR)/include
 INCLUDES += -I$(PROJECT_LIB_DRIVERS_DIR)/include
 INCLUDES += -I$(PROJECT_LIB_DIR)/utils/include
+INCLUDES += -I$(PROJECT_DIR)/inc
 
 ASM_FILES += $(PROJECT_LIB_BSP_DIR)/crt.s
 C_FILES += $(PROJECT_LIB_BSP_DIR)/entry_user.c
+
 C_FILES += $(PROJECT_SRC_DIR)/main.c
+C_FILES += $(PROJECT_SRC_DIR)/core_sync.c
+C_FILES += $(PROJECT_SRC_DIR)/os_entry.c
+#C_FILES += $(PROJECT_SRC_DIR)/devices.c
 
 C_FILES += $(PROJECT_LIB_BSP_DIR)/interrupt.c
 C_FILES += $(PROJECT_LIB_BSP_DIR)/syscalls.c
 C_FILES += $(PROJECT_LIB_BSP_DIR)/printf.c
 C_FILES += $(PROJECT_LIB_BSP_DIR)/locks.c
 C_FILES += $(PROJECT_LIB_BSP_DIR)/sleep.c
+
+#CPP_FILES += $(PROJECT_LIB_BSP_DIR)/device/registry.cpp
 
 C_FILES += $(PROJECT_LIB_DRIVERS_DIR)/fpioa.c
 C_FILES += $(PROJECT_LIB_DRIVERS_DIR)/plic.c
@@ -47,3 +59,21 @@ C_FILES += $(PROJECT_LIB_DRIVERS_DIR)/clint.c
 C_FILES += $(PROJECT_LIB_DRIVERS_DIR)/sysctl.c
 
 LD_SCRIPT=$(PROJECT_DIR)/lds/kendryte.ld
+
+#INCLUDES += -I$(PROJECT_DIR)/third_party
+
+ifeq ($(CFG_FREERTOS_SUPPORT),yes)
+FREERTOS_DIR=$(PROJECT_DIR)/../freeRTOS/FreeRTOS-Kernel-10.0.1/FreeRTOS/Source
+INCLUDES += -I$(FREERTOS_DIR)/include
+C_FILES += $(FREERTOS_DIR)/tasks.c
+C_FILES += $(FREERTOS_DIR)/timers.c
+C_FILES += $(FREERTOS_DIR)/list.c
+C_FILES += $(FREERTOS_DIR)/queue.c
+
+PORTABLE_DIR=$(FREERTOS_DIR)/portable/kendryte
+INCLUDES += -I$(PORTABLE_DIR)
+C_FILES += $(PORTABLE_DIR)/port.c
+ASM_FILES += $(PORTABLE_DIR)/portasm.s
+
+C_FILES += $(PORTABLE_DIR)/heap_4.c
+endif

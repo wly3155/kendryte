@@ -111,7 +111,7 @@ dump_core(const char *reason, uintptr_t cause, uintptr_t epc, uintptr_t regs[32]
 
         DUMP_PRINTF("core dump: %s\r\n", reason);
         DUMP_PRINTF("Cause 0x%016lx, EPC 0x%016lx\r\n", cause, epc);
-
+        DUMP_PRINTF("mtvec 0x%lx\n", read_csr(mtvec));
         int i = 0;
         for (i = 0; i < 32 / 2; i++)
         {

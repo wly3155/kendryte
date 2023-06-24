@@ -12,28 +12,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "sleep.h"
-#include "sysctl.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <sleep.h>
+#include <sysctl.h>
 
-int usleep(uint64_t usec)
+int nanosleep(const struct timespec* req, struct timespec* rem)
 {
-    uint64_t cycle = read_cycle();
-    uint64_t nop_all = usec * sysctl_clock_get_freq(SYSCTL_CLOCK_CPU) / 1000000UL;
-    while (1)
+    uint64_t clock_sleep_ms = (uint64_t)req->tv_sec * 1000;
+    uint64_t nsec_ms = req->tv_nsec / 1000000;
+    uint64_t nsec_trailing = req->tv_nsec % 1000000;
+
+    clock_sleep_ms += nsec_ms;
+
+    if (clock_sleep_ms)
+        vTaskDelay(pdMS_TO_TICKS(clock_sleep_ms));
+
+    uint64_t microsecs = nsec_trailing / 1000;
+    if (microsecs)
     {
-        if(read_cycle() - cycle >= nop_all)
-            break;
+        uint32_t cycles_per_microsec = sysctl_clock_get_freq(SYSCTL_CLOCK_CPU) / 3000000;
+        while (microsecs--)
+        {
+            int i = cycles_per_microsec;
+            while (i--)
+                asm volatile("nop");
+        }
     }
+
     return 0;
 }
 
-int msleep(uint64_t msec)
+int usleep(useconds_t usec)
 {
-    return (unsigned int)usleep(msec * 1000);
+    /* clang-format off */
+    struct timespec req =
+    {
+        .tv_sec = 0,
+        .tv_nsec = usec * 1000
+    };
+    /* clang-format on */
+
+    return nanosleep(&req, (struct timespec*)0x0);
 }
 
 unsigned int sleep(unsigned int seconds)
 {
-    return (unsigned int)msleep(seconds * 1000);
-}
+    /* clang-format off */
+    struct timespec req =
+    {
+        .tv_sec = seconds,
+        .tv_nsec = 0
+    };
+    /* clang-format on */
 
+    return (unsigned int)nanosleep(&req, (struct timespec*)0x0);
+}

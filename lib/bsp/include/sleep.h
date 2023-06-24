@@ -12,25 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef _BSP_SLEEP_H
 #define _BSP_SLEEP_H
 
-#include "encoding.h"
-#include "clint.h"
-#include "syscalls.h"
+#include <clint.h>
+#include <encoding.h>
+#include <sys/time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int usleep(uint64_t usec);
-int msleep(uint64_t msec);
-unsigned int sleep(unsigned int seconds);
-
-#ifdef __cplusplus
-}
-#endif
+extern int nanosleep(const struct timespec* req, struct timespec* rem);
+extern int usleep(useconds_t usec);
+extern unsigned int sleep(unsigned int seconds);
 
 #endif /* _BSP_SLEEP_H */
-

@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef _BSP_INTERRUPT_H
 #define _BSP_INTERRUPT_H
 
@@ -38,10 +37,8 @@ extern "C" {
 /* Supervisor interrupt reason mask for 64 bit system, 0x7FFF FFFF FFFF FFFF */
 #define CAUSE_SUPERVISOR_IRQ_REASON_MASK  (CAUSE_SUPERVISOR_IRQ_MASK - 1)
 /* clang-format on */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _BSP_INTERRUPT_H */
-

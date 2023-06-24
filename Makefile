@@ -26,6 +26,17 @@ ASM_FILES := $(patsubst ./%,%,$(ASM_FILES))
 vpath %.s $(sort $(dir $(ASM_FILES)))
 OBJECTS += $(sort $(ASM_FILES:%.s=$(OUTPUT_DIR)/%.o))
 
+# list of CPP program objects
+CPP_FILES := $(patsubst ./%,%,$(CPP_FILES))
+vpath %.cpp $(sort $(dir $(CPP_FILES)))
+OBJECTS += $(sort $(CPP_FILES:%.cpp=$(OUTPUT_DIR)/%.o))
+
+$(OUTPUT_DIR)/%.o : %.cpp Makefile | $(OUTPUT_DIR)
+	@echo 'compile $< to $@'
+	@mkdir -p $(dir $@)
+	$(_CROSS_COMPILER_G++_) -c $(CXX_FLAGS) $(LD_FLAGS) $(INCLUDES) \
+	-Wa,-a,-ad,-alms=$(OUTPUT_DIR)/$(<:.c=.lst) $< -o $@
+
 $(OUTPUT_DIR)/%.o : %.c Makefile | $(OUTPUT_DIR)
 	@echo 'compile $< to $@'
 	@mkdir -p $(dir $@)
@@ -58,7 +69,7 @@ erase_and_download:
 	$(FLASH_TOOL) --reset write $(OUTPUT_DIR)/$(TARGET).bin $(FLASH_ADDR)
 
 download:
-	$(FLASH_TOOL) --reset write $(OUTPUT_DIR)/$(TARGET).bin $(FLASH_ADDR)
+	$(FLASH_TOOL) -B bit_mic -p /dev/ttyUSB0 $(OUTPUT_DIR)/$(TARGET).bin
 
 gdb_server_start:
 	$(GDB_SERVER)

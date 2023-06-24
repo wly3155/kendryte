@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "printf.h"
-#include "encoding.h"
+#include <printf.h>
+#include <encoding.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,7 +67,7 @@ extern "C" {
  */
 
 /* clang-format off */
-typedef enum _kendryte_log_level
+enum kendryte_log_level_e
 {
     LOG_NONE,       /*!< No log output */
     LOG_ERROR,      /*!< Critical errors, software module can not recover on its own */
@@ -75,7 +75,7 @@ typedef enum _kendryte_log_level
     LOG_INFO,       /*!< Information messages which describe normal flow of events */
     LOG_DEBUG,      /*!< Extra information which is not necessary for normal use (values, pointers, sizes, etc). */
     LOG_VERBOSE     /*!< Bigger chunks of debugging information, or frequent messages which can potentially flood the output. */
-} kendryte_log_level_t ;
+};
 /* clang-format on */
 
 /* clang-format off */
@@ -119,11 +119,11 @@ typedef enum _kendryte_log_level
 #endif
 
 #ifdef CONFIG_LOG_ENABLE
-#define LOGE(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_ERROR)   LOG_PRINTF(LOG_FORMAT(E, format), read_cycle(), tag, ##__VA_ARGS__); } while (0)
-#define LOGW(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_WARN)    LOG_PRINTF(LOG_FORMAT(W, format), read_cycle(), tag, ##__VA_ARGS__); } while (0)
-#define LOGI(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_INFO)    LOG_PRINTF(LOG_FORMAT(I, format), read_cycle(), tag, ##__VA_ARGS__); } while (0)
-#define LOGD(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_DEBUG)   LOG_PRINTF(LOG_FORMAT(D, format), read_cycle(), tag, ##__VA_ARGS__); } while (0)
-#define LOGV(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_VERBOSE) LOG_PRINTF(LOG_FORMAT(V, format), read_cycle(), tag, ##__VA_ARGS__); } while (0)
+#define LOGE(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_ERROR)   LOG_PRINTF(LOG_FORMAT(E, format), read_csr(mcycle), tag, ##__VA_ARGS__); } while (0)
+#define LOGW(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_WARN)    LOG_PRINTF(LOG_FORMAT(W, format), read_csr(mcycle), tag, ##__VA_ARGS__); } while (0)
+#define LOGI(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_INFO)    LOG_PRINTF(LOG_FORMAT(I, format), read_csr(mcycle), tag, ##__VA_ARGS__); } while (0)
+#define LOGD(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_DEBUG)   LOG_PRINTF(LOG_FORMAT(D, format), read_csr(mcycle), tag, ##__VA_ARGS__); } while (0)
+#define LOGV(tag, format, ...)  do {if (CONFIG_LOG_LEVEL >= LOG_VERBOSE) LOG_PRINTF(LOG_FORMAT(V, format), read_csr(mcycle), tag, ##__VA_ARGS__); } while (0)
 #else
 #define LOGE(tag, format, ...)
 #define LOGW(tag, format, ...)

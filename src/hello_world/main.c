@@ -17,13 +17,19 @@
 #include <task.h>
 
 #include "syslog.h"
+#include "inc/spinlock.h"
+
+static atomic_t test;
 
 int main()
 {
     static uint8_t count = 0;
 
+    ATOMIC_INIT(&test);
+
     while (1) {
-        printf("Hello World %u\n", count);
+        atomic_fetch_and_add(&test, 2);
+        printf("Hello World %u, %d\n", count, atomic_read(&test));
         count++;
         vTaskDelay(100);
     }

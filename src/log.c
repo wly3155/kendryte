@@ -1,4 +1,3 @@
-
 /*
  * This file is licensed under the Apache License, Version 2.0.
  *
@@ -13,6 +12,7 @@
  * limitations under the License.
  *
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

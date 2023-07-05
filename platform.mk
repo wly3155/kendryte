@@ -88,6 +88,7 @@ CPP_FILES += $(PROJECT_LIB_BSP_DIR)/device/registry.cpp
 
 C_FILES += $(PROJECT_SRC_DIR)/time.c
 C_FILES += $(PROJECT_SRC_DIR)/log.c
+C_FILES += $(PROJECT_SRC_DIR)/spinlock.c
 C_FILES += $(PROJECT_SRC_DIR)/hello_world/main.c
 #C_FILES += $(PROJECT_SRC_DIR)/time.c
 #C_FILES += $(PROJECT_SRC_DIR)/log.c

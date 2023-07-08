@@ -133,6 +133,9 @@ enum
 /* Diagnostics */
 #define configCHECK_FOR_STACK_OVERFLOW          1
 
+#define configCLINT_BASE_ADDRESS                0
+#define configMTIMECMP_BASE_ADDRESS             0
+
 /* configASSERT behaviour */
 extern void vPortFatal(const char* file, int line, const char* message);
 /* Normal assert() semantics without relying on the provision of an assert.h header file. */

@@ -227,6 +227,7 @@ SECTIONS
   PROVIDE( _tp1 = _tp0 + _stack_size );
   PROVIDE( _sp0 = _tp0 + _stack_size );
   PROVIDE( _sp1 = _tp1 + _stack_size );
+  PROVIDE( __freertos_irq_stack_top = _sp0 );
   /* Heap end is at the end of memory, the memory size can set in kconfig */
   PROVIDE( _heap_end = _ram_end );
   

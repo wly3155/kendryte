@@ -16,7 +16,7 @@
 #include <FreeRTOS.h>
 #include <FreeRTOSConfig.h>
 #include <task.h>
-#include "inc/utils.h"
+#include "utils.h"
 
 uint64_t get_boot_time_ns(void)
 {

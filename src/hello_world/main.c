@@ -28,3 +28,11 @@ int main()
         vTaskDelay(100);
     }
 }
+
+void vPortFatal(const char* file, int line, const char* message)
+{
+    portDISABLE_INTERRUPTS();
+    printf("(%s:%d) %s", file, line, message);
+    while (1);
+
+}

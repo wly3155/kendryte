@@ -22,7 +22,7 @@
 #include "task.h"
 #include "printf.h"
 #include "uarths.h"
-#include "inc/time.h"
+#include "time.h"
 
 #include "atomic.h"
 

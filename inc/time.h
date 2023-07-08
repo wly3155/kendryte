@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 uint64_t get_boot_time_ns(void);

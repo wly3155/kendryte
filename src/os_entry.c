@@ -14,7 +14,7 @@
  */
 #include "FreeRTOS.h"
 #include "core_sync.h"
-#include "kernel/device_priv.h"
+#include "device_priv.h"
 #include "task.h"
 #include <clint.h>
 #include <encoding.h>

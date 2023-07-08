@@ -18,6 +18,7 @@
 #include <semphr.h>
 #include <stdio.h>
 #include <sysctl.h>
+#include <encoding.h>
 
 using namespace sys;
 

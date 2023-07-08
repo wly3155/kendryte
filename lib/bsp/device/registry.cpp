@@ -119,7 +119,7 @@ driver_registry_t sys::g_system_drivers[] = {
     { "/dev/wdt0", { std::in_place, &g_wdt_driver_wdt0 } },
     { "/dev/wdt1", { std::in_place, &g_wdt_driver_wdt1 } },
 
-    { "/dev/rtc0", { std::in_place, &g_rtc_driver_rtc0 } },
+    //{ "/dev/rtc0", { std::in_place, &g_rtc_driver_rtc0 } },
     {}
 };
 

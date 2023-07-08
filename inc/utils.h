@@ -17,17 +17,19 @@
 #define __UTILS_H__
 
 #include <stdint.h>
+#include <sys/time.h>
 
 #ifdef __cplusplus
-extern "c" {
+extern "c"
+{
 #endif
 
-#define REG32_READ(reg)				(*((volatile uint32_t *)reg))
-#define REG32_WRITE(reg, value)		(*((volatile uint32_t *)reg) = value)
+#define REG32_READ(reg) (*((volatile uint32_t *)reg))
+#define REG32_WRITE(reg, value) (*((volatile uint32_t *)reg) = value)
 
-#define min(x, y)					((x) < (y) ? (x) : (y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
 
-#define ms_to_ns(time)				((uint64_t)(time) * 1000000)
+#define ms_to_ns(time) ((uint64_t)(time)*1000000)
 
 #ifdef __cplusplus
 }

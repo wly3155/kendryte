@@ -5,7 +5,7 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ *lib/freertos/kernel/network
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,12 +20,12 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-volatile UBaseType_t g_core_pending_switch[portNUM_PROCESSORS] = { 0 };
-static volatile UBaseType_t s_core_sync_events[portNUM_PROCESSORS] = { 0 };
-static volatile TaskHandle_t s_pending_to_add_tasks[portNUM_PROCESSORS] = { 0 };
-static volatile UBaseType_t s_core_awake[portNUM_PROCESSORS] = { 1, 0 };
-static volatile UBaseType_t s_core_sync_in_progress[portNUM_PROCESSORS] = { 0 };
-extern UBaseType_t *volatile pxCurrentTCB[portNUM_PROCESSORS];
+volatile UBaseType_t g_core_pending_switch[configNUM_CORES] = { 0 };
+static volatile UBaseType_t s_core_sync_events[configNUM_CORES] = { 0 };
+static volatile TaskHandle_t s_pending_to_add_tasks[configNUM_CORES] = { 0 };
+static volatile UBaseType_t s_core_awake[configNUM_CORES] = { 1 };
+static volatile UBaseType_t s_core_sync_in_progress[configNUM_CORES] = { 0 };
+extern UBaseType_t *volatile pxCurrentTCBs[configNUM_CORES];
 
 void handle_irq_m_soft(uintptr_t cause, uintptr_t epc)
 {
@@ -38,7 +38,7 @@ void handle_irq_m_soft(uintptr_t cause, uintptr_t epc)
         TaskHandle_t newTask = atomic_read(&s_pending_to_add_tasks[core_id]);
         if (newTask)
         {
-            vAddNewTaskToCurrentReadyList(newTask);
+            //vAddNewTaskToCurrentReadyList(newTask);
             atomic_set(&s_pending_to_add_tasks[core_id], NULL);
         }
     }
@@ -55,9 +55,9 @@ void handle_irq_m_soft(uintptr_t cause, uintptr_t epc)
 
 void handle_irq_m_timer(uintptr_t cause, uintptr_t epc)
 {
-    if (pxCurrentTCB[uxPortGetProcessorId()])
+    if (pxCurrentTCBs[uxPortGetProcessorId()])
     {
-        prvSetNextTimerInterrupt();
+        //prvSetNextTimerInterrupt();
         /* Increment the RTOS tick. */
         if (xTaskIncrementTick() != pdFALSE)
         {

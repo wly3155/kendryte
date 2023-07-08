@@ -41,7 +41,7 @@ PROJECT_SRC_DIR=$(PROJECT_DIR)/src
 #INCLUDES += -I$(PROJECT_DIR)
 #INCLUDES += -I$(PROJECT_DIR)/inc
 
-INCLUDES += -I$(PROJECT_DIR)
+INCLUDES += -I$(PROJECT_DIR)/inc
 INCLUDES += -I$(PROJECT_LIB_DIR)/arch/include
 INCLUDES += -I$(PROJECT_LIB_DIR)/utils/include
 INCLUDES += -I$(PROJECT_LIB_DIR)
@@ -113,27 +113,32 @@ LD_SCRIPT=$(PROJECT_DIR)/lds/kendryte.ld
 LD_FLAGS += -Wl,--wrap,printf
 
 ifeq ($(CFG_FREERTOS_SUPPORT),yes)
-FREERTOS_DIR=$(PROJECT_DIR)/lib/freertos
+FREERTOS_DIR=$(PROJECT_DIR)/../freeRTOS_SMP
+#FREERTOS_DIR=$(PROJECT_DIR)/lib/freertos
 INCLUDES += -I$(FREERTOS_DIR)/include
 C_FILES += $(FREERTOS_DIR)/tasks.c
 C_FILES += $(FREERTOS_DIR)/timers.c
 C_FILES += $(FREERTOS_DIR)/list.c
 C_FILES += $(FREERTOS_DIR)/queue.c
 
-C_FILES += $(FREERTOS_DIR)/core_sync.c
-C_FILES += $(FREERTOS_DIR)/os_entry.c
-C_FILES += $(FREERTOS_DIR)/pthread.c
+#C_FILES += $(FREERTOS_DIR)/core_sync.c
+#C_FILES += $(FREERTOS_DIR)/os_entry.c
+#C_FILES += $(FREERTOS_DIR)/pthread.c
+#C_FILES += $(PORTABLE_DIR)/heap_4.c
 
-PORTABLE_DIR=$(FREERTOS_DIR)/portable
+PORTABLE_DIR=$(FREERTOS_DIR)/portable/GCC/RISC-V
 INCLUDES += -I$(PORTABLE_DIR)
+INCLUDES += -I$(PORTABLE_DIR)/chip_specific_extensions/RV32I_CLINT_no_extensions
 C_FILES += $(PORTABLE_DIR)/port.c
-ASM_FILES += $(PORTABLE_DIR)/portasm.s
+ASM_FILES += $(PORTABLE_DIR)/portASM.s
 
-C_FILES += $(PORTABLE_DIR)/heap_4.c
+C_FLAGS += -D__riscv_xlen=64
+C_FLAGS += -DportasmHANDLE_INTERRUPT=handle_irq
 
-CPP_FILES += $(FREERTOS_DIR)/kernel/devices.cpp
-CPP_FILES += $(FREERTOS_DIR)/kernel/driver_impl.cpp
-CPP_FILES += $(FREERTOS_DIR)/kernel/storage/filesystem.cpp
+
+#CPP_FILES += $(FREERTOS_DIR)/kernel/devices.cpp
+#CPP_FILES += $(FREERTOS_DIR)/kernel/driver_impl.cpp
+#CPP_FILES += $(FREERTOS_DIR)/kernel/storage/filesystem.cpp
 endif
 
 C_FILES += $(PROJECT_THIRD_PARTY_DIR)/fatfs/source/ff.c

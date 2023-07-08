@@ -57,7 +57,7 @@
 #include <stdint.h>
 
 /* clock */
-#define configCPU_CLOCK_HZ					uxPortGetCPUClock()
+#define configCPU_CLOCK_HZ					(390000000)
 #define configTICK_CLOCK_HZ					( configCPU_CLOCK_HZ / 50 )
 #define configTICK_RATE_HZ					( ( TickType_t ) 100 )
 
@@ -131,7 +131,10 @@ enum
 #define INCLUDE_xSemaphoreGetMutexHolder        1
 
 /* Diagnostics */
-#define configCHECK_FOR_STACK_OVERFLOW          1
+#define configCHECK_FOR_STACK_OVERFLOW          0
+
+#define configMTIME_BASE_ADDRESS                (0x02000000U + 0xBFF8)
+#define configMTIMECMP_BASE_ADDRESS             (0x02000000U + 0x4000)
 
 /* configASSERT behaviour */
 extern void vPortFatal(const char* file, int line, const char* message);

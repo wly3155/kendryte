@@ -2,3 +2,5 @@
 *.o
 *.log
 *OUT
+*.vscode/*
+*.code-workspace
